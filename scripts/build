@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+
+set -e
+
+source $(dirname $0)/version
+
+cd $(dirname $0)/..
+
+echo "==> Building code binaries version ${VERSION} ..."
+
+declare -A OS_ARCH_ARG
+
+OS_PLATFORM_ARG=(linux darwin)
+OS_ARCH_ARG[linux]="amd64 arm arm64"
+OS_ARCH_ARG[darwin]="amd64 arm64"
+
+BUILD_DIR=$(dirname $0)"/../build/bin"
+
+if [ "$(uname)" = "Linux" ]; then
+    OTHER_LINKFLAGS="-extldflags -static -s"
+fi
+
+LINKFLAGS="-X main.VERSION=$VERSION $LINKFLAGS"
+LINKFLAGS="-X github.com/rawmind0/api-test.Version=$VERSION"
+LINKFLAGS="-X github.com/rawmind0/api-test.GitCommit=$COMMIT $LINKFLAGS"
+
+if [ ! -d "bin" ]; then
+    mkdir -p bin
+fi
+
+CGO_ENABLED=0 go build -ldflags "$LINKFLAGS $OTHER_LINKFLAGS" -o bin/${BIN_NAME}
+
+if [ -n "$CROSS" ]; then
+    if [ -d "${BUILD_DIR}" ]; then
+        rm -rf ${BUILD_DIR}
+    fi
+    mkdir -p ${BUILD_DIR}
+    for OS in ${OS_PLATFORM_ARG[@]}; do
+        for ARCH in ${OS_ARCH_ARG[${OS}]}; do
+            OUTPUT_BIN="${BUILD_DIR}/${BIN_NAME}_${OS}_${ARCH}"
+            echo "Building binary for $OS/$ARCH..."
+            GOARCH=$ARCH GOOS=$OS CGO_ENABLED=0 go build \
+                  -ldflags "$LINKFLAGS $OTHER_LINKFLAGS" \
+                  -o ${OUTPUT_BIN} ./
+        done
+    done
+fi
