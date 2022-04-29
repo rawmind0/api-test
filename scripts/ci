@@ -3,7 +3,6 @@ set -e
 
 cd $(dirname $0)
 
-CROSS=1 ./build
-./validate
+./build
 ./validate-ci
 ./package

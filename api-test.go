@@ -14,8 +14,10 @@ import (
 
 // VERSION gets overridden at build time using -X main.VERSION=$VERSION
 var (
-	NAME    = "dev"
-	VERSION = "dev"
+	NAME     = "dev"
+	VERSION  = "dev"
+	notFound = fmt.Sprintf("%d", http.StatusNotFound)
+	statusOK = fmt.Sprintf("%d", http.StatusOK)
 )
 
 func main() {
@@ -62,19 +64,40 @@ func mainErr() error {
 }
 
 func runAPITest(ctx *cli.Context) error {
-	fmt.Printf("Starting api-test %s version %s at port %s\n", NAME, VERSION, ctx.GlobalString("port"))
+	log.Infof("Starting api-test %s version %s at port %s\n", NAME, VERSION, ctx.GlobalString("port"))
 
 	router := mux.NewRouter().StrictSlash(true)
+	router.NotFoundHandler = handle404()
 	router.HandleFunc("/", apiHandler)
 	return http.ListenAndServe(":"+ctx.GlobalString("port"), router)
 }
 
 func apiHandler(w http.ResponseWriter, r *http.Request) {
-	log.Debugf("%s-%s-%s%s-%s", r.Method, r.Proto, r.Host, r.RequestURI, r.RemoteAddr)
+	log.Debugf("%s-%s-%s-%s%s-%s", statusOK, r.Method, r.Proto, r.Host, r.RequestURI, r.RemoteAddr)
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.Header().Set("X-Content-Type-Options", "nosniff")
+	w.WriteHeader(http.StatusOK)
 	response := map[string]string{
-		"service":     NAME,
-		"version":     VERSION,
-		"description": fmt.Sprintf("Microservice %s version %s", NAME, VERSION),
+		"name":    NAME,
+		"version": VERSION,
+		"message": fmt.Sprintf("Microservice %s version %s", NAME, VERSION),
+		"status":  statusOK,
 	}
 	json.NewEncoder(w).Encode(response)
+}
+
+func handle404() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Debugf("%s-%s-%s-%s%s-%s", notFound, r.Method, r.Proto, r.Host, r.RequestURI, r.RemoteAddr)
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.Header().Set("X-Content-Type-Options", "nosniff")
+		w.WriteHeader(http.StatusNotFound)
+		response := map[string]string{
+			"name":    NAME,
+			"version": VERSION,
+			"message": http.StatusText(http.StatusNotFound),
+			"status":  notFound,
+		}
+		json.NewEncoder(w).Encode(response)
+	})
 }
