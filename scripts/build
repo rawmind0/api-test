@@ -18,8 +18,8 @@ if [ "$(uname)" = "Linux" ]; then
     OTHER_LINKFLAGS="-extldflags -static -s"
 fi
 
-LINKFLAGS="-X main.VERSION=$VERSION $LINKFLAGS"
-LINKFLAGS="-X github.com/rawmind0/api-test.Version=$VERSION"
+LINKFLAGS="-X main.VERSION=$VERSION"
+LINKFLAGS="-X github.com/rawmind0/api-test.Version=$VERSION $LINKFLAGS"
 LINKFLAGS="-X github.com/rawmind0/api-test.GitCommit=$COMMIT $LINKFLAGS"
 
 if [ ! -d "bin" ]; then
