@@ -13,13 +13,8 @@ package:
 docker-build: 
 	@sh -c "'./scripts/docker-build'"
 
-validate: fmtcheck lint vet
+validate: fmtcheck lint vet mod-verify
 
-test: fmtcheck
-	@echo "==> Running testing..."
-	go test ./ || exit 1
-	echo ./ | \
-		xargs -t -n4 go test $(TESTARGS) -timeout=30s -parallel=4
 vet:
 	@echo "==> Checking that code complies with go vet requirements..."
 	@go vet $$(go list ./... | grep -v vendor/); if [ $$? -gt 0 ]; then \
@@ -38,6 +33,10 @@ lint:
 		exit 1; \
 	fi
 
+mod-verify:
+	@echo "==> Verifying go modules..."
+	@go mod verify
+
 bin:
 	go build -o $(PKG_NAME)
 
@@ -47,4 +46,4 @@ fmt:
 fmtcheck:
 	@sh -c "'$(CURDIR)/scripts/go-fmt-check'"
 
-.PHONY: build vet fmt fmtcheck bin package
+.PHONY: build vet lint fmt fmtcheck bin package mod-verify

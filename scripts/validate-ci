@@ -3,6 +3,8 @@ set -e
 
 cd $(dirname $0)/..
 
+echo "==> Validating ci for version ${VERSION} ..."
+
 go generate
 GOPATH= go mod tidy
 
