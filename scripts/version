@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
 BIN_NAME="api-test"
+BUILD_DIR=$(dirname $0)"/../build/bin"
+ARTIFACTS_DIR=$(dirname $0)"/../dist/artifacts"
 
 if [ -n "$(git status --porcelain --untracked-files=no)" ]; then
     DIRTY="-dirty"
@@ -15,4 +17,11 @@ elif [ -n "$GIT_TAG" ]; then
 else
     COMMIT=$(git rev-parse --short HEAD)
     VERSION="${COMMIT}${DIRTY}"
+fi
+
+TAG=${TAG:-${VERSION}}
+REPO=${REPO:-rawmind}
+
+if echo $TAG | grep -q dirty; then
+    TAG=dev
 fi

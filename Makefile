@@ -1,11 +1,14 @@
 GOFMT_FILES?=$$(find . -name '*.go' |grep -v vendor)
-PKG_NAME=rancher2
+PKG_NAME=api-test
 TEST?="./"
 
 default: build
 
 build: validate
 	@sh -c "./scripts/build"
+
+package:
+	@sh -c "./scripts/package"
 
 docker-build: 
 	@sh -c "'./scripts/docker-build'"
@@ -21,11 +24,8 @@ vet:
 	@echo "==> Checking that code complies with go vet requirements..."
 	@go vet $$(go list ./... | grep -v vendor/); if [ $$? -gt 0 ]; then \
 		echo ""; \
-		echo "WARNING!! Expected vet reported construct:"; \
-		echo "rancher2/schema_secret_v2.go:20:2: struct field Type repeats json tag \"type\" also at ../../../../github.com/rancher/norman@v0.0.0-20210225010917-c7fd1e24145b/types/types.go:66"; \
-		echo "";\
-		echo "If vet reported more suspicious constructs, please check and"; \
-		echo "fix them if necessary, before submitting the code for review."; \
+		echo "go vet reported suspicious constructs. Please check the reported issues"; \
+		echo "and fix them if necessary before submitting the code for review."; \
 	fi
 
 lint:
@@ -39,7 +39,7 @@ lint:
 	fi
 
 bin:
-	go build -o $(PROVIDER_NAME)
+	go build -o $(PKG_NAME)
 
 fmt:
 	gofmt -s -w $(GOFMT_FILES)
@@ -47,4 +47,4 @@ fmt:
 fmtcheck:
 	@sh -c "'$(CURDIR)/scripts/go-fmt-check'"
 
-.PHONY: build vet fmt fmtcheck bin
+.PHONY: build vet fmt fmtcheck bin package

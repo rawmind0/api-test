@@ -47,12 +47,12 @@ func mainErr() error {
 			Usage: "Debug logging",
 		},
 		cli.StringFlag{
-			Name:  "name",
+			Name:  "name,n",
 			Usage: "service name",
 			Value: "dev",
 		},
 		cli.StringFlag{
-			Name:  "port",
+			Name:  "port,p",
 			Usage: "service port",
 			Value: "8080",
 		},
@@ -70,6 +70,7 @@ func runAPITest(ctx *cli.Context) error {
 }
 
 func apiHandler(w http.ResponseWriter, r *http.Request) {
+	log.Debugf("%s-%s-%s%s-%s", r.Method, r.Proto, r.Host, r.RequestURI, r.RemoteAddr)
 	response := map[string]string{
 		"service":     NAME,
 		"version":     VERSION,

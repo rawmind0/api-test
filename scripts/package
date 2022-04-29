@@ -1,18 +1,39 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -e
 
 source $(dirname $0)/version
 
 cd $(dirname $0)/..
 
-mkdir -p dist/artifacts
-cp bin/github-metrics dist/artifacts/github-metrics${SUFFIX}
+#mkdir -p dist/artifacts
+#cp bin/api-test dist/artifacts/api-test${SUFFIX}
 
-IMAGE=${REPO}/github-metrics:${TAG}
+IMAGE=${REPO}/api-test:${TAG}
 DOCKERFILE=package/Dockerfile
 if [ -e ${DOCKERFILE}.${ARCH} ]; then
     DOCKERFILE=${DOCKERFILE}.${ARCH}
 fi
 
-docker build -f ${DOCKERFILE} -t ${IMAGE} .
-echo Built ${IMAGE}
+OS=linux
+OS_ARCH="amd64 arm64"
+
+MANIFEST_AMEND=""
+if [ -d "${ARTIFACTS_DIR}" ]; then
+    rm -rf ${ARTIFACTS_DIR}
+fi
+mkdir -p ${ARTIFACTS_DIR}
+
+DOCKER_USER=${DOCKER_USER:-"rawmind"}
+echo "Login to docker registry as ${DOCKER_USER} ..."
+docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
+for ARCH in ${OS_ARCH}; do
+    echo Building ${IMAGE}_${OS}_${ARCH} ...
+    cp -p ${BUILD_DIR}/${BIN_NAME}_${OS}_${ARCH} ${ARTIFACTS_DIR}/${BIN_NAME}
+    docker build --platform ${OS}/${ARCH} -f ${DOCKERFILE} -t ${IMAGE}_${OS}_${ARCH} .
+    MANIFEST_AMEND="${MANIFEST_AMEND} --amend ${IMAGE}_${OS}_${ARCH}"
+    mv ${ARTIFACTS_DIR}/${BIN_NAME} ${BUILD_DIR}/${BIN_NAME}_${OS}_${ARCH}
+    echo Pushing ${IMAGE}_${OS}_${ARCH} ...
+    docker push ${IMAGE}_${OS}_${ARCH}
+done
+docker manifest create ${IMAGE} ${MANIFEST_AMEND}
+docker manifest push ${IMAGE}
