@@ -21,7 +21,7 @@ if [ -d "${ARTIFACTS_DIR}" ]; then
     rm -rf ${ARTIFACTS_DIR}
 fi
 mkdir -p ${ARTIFACTS_DIR}
-cp -p ${BUILD_DIR}/${BIN_NAME}_* ${ARTIFACTS_DIR}/${BIN_NAME}
+cp -p ${BUILD_DIR}/${BIN_NAME}_* ${ARTIFACTS_DIR}/
 
 DOCKER_USER=${DOCKER_USER:-"rawmind"}
 echo "Login to docker registry as ${DOCKER_USER} ..."
