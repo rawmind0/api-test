@@ -10,7 +10,9 @@ jobs:
     container: golang:1.17.9-alpine3.15
     steps:
     - name: Install prerequisites
-      run: apk -U add bash git gcc musl-dev make docker-cli curl ca-certificates
+      run: |
+        apk -U add bash git gcc musl-dev make docker-cli curl ca-certificates
+        export GIT_CEILING_DIRECTORIES=/__w
     - uses: actions/checkout@v3
     - name: Build
       run: CROSS=1 make build
