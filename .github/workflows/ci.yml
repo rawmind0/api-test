@@ -19,3 +19,4 @@ jobs:
         git config --global --add safe.directory /__w/api-test/api-test
         ls -la
         CROSS=1 make build
+        echo "Deploying tag ${{ github.ref }}"
