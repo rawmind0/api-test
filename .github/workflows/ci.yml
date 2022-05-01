@@ -6,8 +6,11 @@ on:
     branches: [ main ]
 jobs:
   build:
-    runs-on: ubuntu-latest
+    container:
+      image: golang:1.17.9-alpine3.15
     steps:
     - uses: actions/checkout@v3
+    - name: Install requirements
+      run: apk -U add bash git gcc musl-dev make docker-cli curl ca-certificates
     - name: Build
       run: CROSS=1 make
