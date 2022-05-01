@@ -29,7 +29,7 @@ docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
 for ARCH in ${OS_ARCH}; do
     echo Building ${IMAGE}_${OS}_${ARCH} ...
     mv ${ARTIFACTS_DIR}/${BIN_NAME}_${OS}_${ARCH} ${ARTIFACTS_DIR}/${BIN_NAME}
-    docker build --platform ${OS}/${ARCH} -f ${DOCKERFILE} -t ${IMAGE}_${OS}_${ARCH} .
+    docker build --platform ${OS}/${ARCH} --build-arg ARCH=${ARCH} -f ${DOCKERFILE} -t ${IMAGE}_${OS}_${ARCH} .
     MANIFEST_AMEND="${MANIFEST_AMEND} --amend ${IMAGE}_${OS}_${ARCH}"
     mv ${ARTIFACTS_DIR}/${BIN_NAME} ${BUILD_DIR}/${BIN_NAME}_${OS}_${ARCH}
     echo Pushing ${IMAGE}_${OS}_${ARCH} ...
