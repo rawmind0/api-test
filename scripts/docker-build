@@ -2,7 +2,7 @@
 
 set -e
 
-echo "==> Running dockerized build..."
+echo "==> Running dockerized build env..."
 
 # Setting docker
 DOCKER_NAME=docker
@@ -24,4 +24,4 @@ ${DOCKER_BIN} build -t ${BUILDER_TAG} -f $(dirname $0)/Dockerfile.builder .
 ${DOCKER_BIN} run -i --rm \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v $PWD:/go/src/github.com/rawmind0/api-test \
-  ${BUILDER_TAG} make build-rancher
+  ${BUILDER_TAG} make $1

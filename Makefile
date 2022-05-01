@@ -7,11 +7,17 @@ default: build
 build: validate
 	@sh -c "./scripts/build"
 
+ci: validate
+	@sh -c "./scripts/ci"
+
 package:
 	@sh -c "./scripts/package"
 
 docker-build: 
-	@sh -c "'./scripts/docker-build'"
+	@sh -c "./scripts/docker-build build"
+
+docker-ci: 
+	@sh -c "./scripts/docker-build ci"
 
 validate: fmtcheck lint vet mod-verify
 
@@ -44,6 +50,6 @@ fmt:
 	gofmt -s -w $(GOFMT_FILES)
 
 fmtcheck:
-	@sh -c "'$(CURDIR)/scripts/go-fmt-check'"
+	@sh -c "./scripts/go-fmt-check"
 
-.PHONY: build vet lint fmt fmtcheck bin package mod-verify
+.PHONY: build vet lint fmt fmtcheck bin package mod-verify docker-ci docker-build

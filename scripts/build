@@ -11,7 +11,7 @@ echo "==> Building code binaries version ${VERSION} ..."
 declare -A OS_ARCH_ARG
 
 OS_PLATFORM_ARG=(linux darwin)
-OS_ARCH_ARG[linux]="amd64 arm arm64"
+OS_ARCH_ARG[linux]="amd64 arm64"
 OS_ARCH_ARG[darwin]="amd64 arm64"
 
 if [ "$(uname)" = "Linux" ]; then
