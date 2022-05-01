@@ -20,13 +20,13 @@ jobs:
         make build
         echo "Deploying tag ${{ github.ref }}"
     - name: Build cross binaries
-      if: ${{ github.event_name == 'create' && github.event.ref_type == 'tag' }}
+      if: ${{ github.event.ref_type == 'tag' }}
       run: CROSS=1 make build
     - name: Validate
-      if: ${{ github.event_name == 'create' && github.event.ref_type == 'tag' }}
+      if: ${{ github.event.ref_type == 'tag' }}
       run: make validate-ci
     - name: Package and Release
-      if: ${{ github.event_name == 'create' && github.event.ref_type == 'tag' }}
+      if: ${{ github.event.ref_type == 'tag' }}
       env:
         DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
         DOCKER_USER: ${{ secrets.DOCKER_USER }}
