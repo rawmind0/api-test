@@ -16,5 +16,6 @@ jobs:
     - name: Build
       run: |
         export GIT_CEILING_DIRECTORIES=/__w
+        git config --global --add safe.directory /__w/api-test/api-test
         ls -la
         CROSS=1 make build
