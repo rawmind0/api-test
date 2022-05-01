@@ -9,5 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
+      with:
+        set-safe-directory: false
     - name: Build
       run: CROSS=1 make docker-build
