@@ -9,7 +9,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-      with:
-        set-safe-directory: false
+    - run: git config --global --add safe.directory /go/src/github.com/rawmind0/api-test
     - name: Build
       run: CROSS=1 make docker-build
