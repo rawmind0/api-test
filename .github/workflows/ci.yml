@@ -5,7 +5,7 @@ on:
   pull_request:
     branches: [ main ]
 jobs:
-  build:
+  ci:
     runs-on: ubuntu-18.04
     container: golang:1.17.9-alpine3.15
     steps:
@@ -15,8 +15,18 @@ jobs:
     - uses: actions/checkout@v3
     - name: Build
       run: |
-        export GIT_CEILING_DIRECTORIES=/__w
         git config --global --add safe.directory /__w/api-test/api-test
-        ls -la
-        CROSS=1 make build
+        make build
         echo "Deploying tag ${{ github.ref }}"
+    - name: Build cross binaries
+      if: ${{ github.event_name == 'create' && github.event.ref_type == 'tag' }}
+      run: CROSS=1 make build
+    - name: Validate
+      if: ${{ github.event_name == 'create' && github.event.ref_type == 'tag' }}
+      run: make validate-ci
+    - name: Package and Release
+      if: ${{ github.event_name == 'create' && github.event.ref_type == 'tag' }}
+      env:
+        DOCKER_PASS: ${{ secrets.DOCKER_PASS }}
+        DOCKER_USER: ${{ secrets.DOCKER_USER }}
+      run: make package

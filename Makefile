@@ -13,6 +13,9 @@ ci: validate
 package:
 	@sh -c "./scripts/package"
 
+validate-ci:
+	@sh -c "./scripts/validate-ci"
+
 docker-build: 
 	@sh -c "./scripts/docker-build build"
 
